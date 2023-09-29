@@ -1,7 +1,6 @@
-# TODO: process docs to HTML?
 #
 # Conditional build:
-%bcond_without	doc	# Markdown documentation
+%bcond_without	doc	# Sphinx documentation
 %bcond_without	tests	# unit tests
 %bcond_without	python2 # CPython 2.x module
 %bcond_without	python3 # CPython 3.x module
@@ -9,13 +8,13 @@
 Summary:	Fast, simple packet creation / parsing, with definitions for the basic TCP/IP protocols
 Summary(pl.UTF-8):	Szybkie, proste tworzenie i analiza pakietów z definicjami podstawowych protokołów TCP/IP
 Name:		python-dpkt
-Version:	1.9.7.2
-Release:	3
+Version:	1.9.8
+Release:	1
 License:	BSD
 Group:		Libraries/Python
 #Source0Download: https://pypi.org/simple/dpkt/
 Source0:	https://files.pythonhosted.org/packages/source/d/dpkt/dpkt-%{version}.tar.gz
-# Source0-md5:	ac3ace1c5ee12a74f12a863ac9082b59
+# Source0-md5:	0f16de3c0b8caa6ec2261210f08c7b8b
 URL:		https://pypi.org/project/dpkt/
 %if %{with python2}
 BuildRequires:	python-modules >= 1:2.7
@@ -33,8 +32,13 @@ BuildRequires:	python3-pytest
 BuildRequires:	python3-pytest-cov
 %endif
 %endif
+%if %{with doc}
+BuildRequires:	python3-myst_parser
+BuildRequires:	sphinx-pdg-3 >= 2.1
+%endif
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
+BuildRequires:	sed >= 4.0
 Requires:	python-modules >= 1:2.7
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -75,6 +79,8 @@ Dokumentacja API modułu Pythona dpkt.
 %prep
 %setup -q -n dpkt-%{version}
 
+%{__sed} -i -e 's/^import mock/from unittest &/' docs/conf.py
+
 %build
 %if %{with python2}
 %py_build
@@ -94,6 +100,10 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
 PYTEST_PLUGINS="pytest_cov.plugin" \
 %{__python3} -m pytest dpkt
 %endif
+%endif
+
+%if %{with doc}
+sphinx-build-3 -b html docs docs/_build/html
 %endif
 
 %install
@@ -131,5 +141,5 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with doc}
 %files apidocs
 %defattr(644,root,root,755)
-%doc docs/*
+%doc docs/_build/html/{_static,api,*.html,*.js}
 %endif
