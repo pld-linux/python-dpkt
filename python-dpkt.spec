@@ -9,7 +9,7 @@ Summary:	Fast, simple packet creation / parsing, with definitions for the basic 
 Summary(pl.UTF-8):	Szybkie, proste tworzenie i analiza pakietów z definicjami podstawowych protokołów TCP/IP
 Name:		python-dpkt
 Version:	1.9.8
-Release:	2
+Release:	3
 License:	BSD
 Group:		Libraries/Python
 #Source0Download: https://pypi.org/simple/dpkt/
